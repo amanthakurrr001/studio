@@ -21,7 +21,7 @@ type StoredQuiz = {
     quizData: QuizQuestion[];
 };
 
-export default function QuizPlayPage({ params }: { params: { id: string } }) {
+export default function QuizPlayPage() {
   const router = useRouter();
   const [quiz, setQuiz] = useState<StoredQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);

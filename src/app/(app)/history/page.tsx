@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -89,7 +91,7 @@ export default function HistoryPage() {
                                             <Link href={`/growth/${encodeURIComponent(quiz.topic.toLowerCase().replace(/\s+/g, '-'))}`}><BarChart3 className="h-4 w-4" /></Link>
                                         </Button>
                                         <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
-                                        <Button size="icon" asChild><Link href="/quiz/1"><Play className="h-4 w-4" /></Link></Button>
+                                        <Button size="icon" asChild><Link href="/quiz/play"><Play className="h-4 w-4" /></Link></Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
