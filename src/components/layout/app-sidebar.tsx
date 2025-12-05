@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
 import { 
     LayoutDashboard, 
     History, 
     User, 
     LogOut,
-    BrainCircuit
+    BrainCircuit,
+    Users
 } from "lucide-react";
 import { 
     Sidebar,
@@ -22,19 +24,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-const menuItems = [
-    { href: '/dashboard', label: 'Workspace', icon: LayoutDashboard },
-    { href: '/history', label: 'Quiz History', icon: History },
-];
 
 export function AppSidebar() {
     const pathname = usePathname();
     const router = useRouter();
+    const [userType, setUserType] = useState<string | null>(null);
+
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        setUserType(user);
+    }, [pathname]);
+
+    const menuItems = [
+        { href: '/dashboard', label: 'Workspace', icon: LayoutDashboard },
+        ...(userType === 'authenticated' ? [{ href: '/history', label: 'Quiz History', icon: History }] : []),
+    ];
 
     const handleLogout = () => {
-        // Simulate logout and redirect to login page
+        localStorage.removeItem('user');
         router.push('/auth/login');
     }
+
+    const isGuest = userType === 'guest';
 
     return (
         <Sidebar>
@@ -71,20 +82,24 @@ export function AppSidebar() {
                         <SidebarMenuButton 
                             asChild
                             isActive={pathname === '/profile'}
-                            tooltip={{children: "Profile"}}
+                            tooltip={{children: isGuest ? "Guest Profile" : "Profile"}}
                         >
                             <Link href="/profile" className="w-full">
-                                <Avatar className="w-6 h-6">
-                                    <AvatarImage src="https://picsum.photos/seed/user-avatar/100/100" data-ai-hint="person portrait" />
-                                    <AvatarFallback>JD</AvatarFallback>
-                                </Avatar>
-                                <span>Profile</span>
+                                { isGuest ? (
+                                    <Users className="w-6 h-6" />
+                                ) : (
+                                    <Avatar className="w-6 h-6">
+                                        <AvatarImage src="https://picsum.photos/seed/user-avatar/100/100" data-ai-hint="person portrait" />
+                                        <AvatarFallback>JD</AvatarFallback>
+                                    </Avatar>
+                                )}
+                                <span>{ isGuest ? "Guest" : "Profile" }</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
                 <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" onClick={handleLogout}>
-                    <LogOut /> <span>Logout</span>
+                    <LogOut /> <span>{isGuest ? 'Exit' : 'Logout'}</span>
                 </Button>
             </SidebarFooter>
         </Sidebar>
