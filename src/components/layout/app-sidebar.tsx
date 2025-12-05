@@ -8,7 +8,7 @@ import {
     History, 
     User, 
     LogOut,
-    BrainCircuit,
+    Bot,
     Users
 } from "lucide-react";
 import { 
@@ -51,7 +51,7 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarHeader>
                 <div className="flex items-center gap-2">
-                    <BrainCircuit className="w-8 h-8 text-sidebar-primary" />
+                    <Bot className="w-8 h-8 text-sidebar-primary" />
                     <h1 className="text-xl font-bold font-headline text-sidebar-primary-foreground">
                         QuizCraft AI
                     </h1>

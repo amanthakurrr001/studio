@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BrainCircuit } from 'lucide-react';
+import { ArrowRight, Bot } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -27,7 +27,7 @@ export function Hero() {
           </div>
           <div className="flex justify-center">
             <div className="w-72 h-72 bg-secondary rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                <BrainCircuit className="w-36 h-36 text-primary" />
+                <Bot className="w-36 h-36 text-primary" />
             </div>
           </div>
         </div>
