@@ -6,50 +6,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Info, Download, Play, Save, Trash2, Loader2, Sparkles, Users } from 'lucide-react';
+import { Download, Play, Save, Trash2, Loader2, Sparkles, Users } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 import { generateQuizFromTopic, type GenerateQuizFromTopicOutput } from '@/ai/flows/generate-quiz-from-topic';
 import { useRouter } from 'next/navigation';
 
-const AIGenerator = ({ onQuizGenerated, isGuest }: { onQuizGenerated: (quiz: GenerateQuizFromTopicOutput) => void, isGuest: boolean }) => {
+const AIGenerator = ({ onQuizGenerated }: { onQuizGenerated: (quiz: GenerateQuizFromTopicOutput) => void }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState('');
   const [topic, setTopic] = useState("The Renaissance period in Europe");
   const [numQuestions, setNumQuestions] = useState(5);
   const [difficulty, setDifficulty] = useState("Medium");
 
-  useEffect(() => {
-    if (isGuest) {
-      setApiKey('guest-key'); // Guests don't need a real key for this simulation
-    } else {
-      const savedKey = localStorage.getItem('gemini-api-key');
-      if (savedKey) {
-        setApiKey(savedKey);
-      }
-    }
-  }, [isGuest]);
-
-
   const handleGenerate = async () => {
-    if (!apiKey && !isGuest) {
-      toast({
-        variant: "destructive",
-        title: "API Key Required",
-        description: "Please save your Gemini API key before generating a quiz.",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       const result = await generateQuizFromTopic({
         topic,
         numQuestions,
         difficulty,
-        apiKey: isGuest ? undefined : apiKey,
       });
       onQuizGenerated(result);
       toast({
@@ -124,53 +101,6 @@ const ManualCreator = () => (
     </CardFooter>
   </Card>
 );
-
-const ApiKeyManager = () => {
-    const { toast } = useToast();
-    const [apiKey, setApiKey] = useState('');
-
-    useEffect(() => {
-        const savedKey = localStorage.getItem('gemini-api-key');
-        if (savedKey) {
-            setApiKey(savedKey);
-        }
-    }, []);
-
-    const handleSaveKey = () => {
-        localStorage.setItem('gemini-api-key', apiKey);
-        toast({
-            title: "API Key Saved",
-            description: "Your Gemini API key has been saved locally.",
-        });
-    };
-    
-    return (
-        <Card className="mb-8">
-            <CardHeader>
-                <CardTitle>Gemini API Key</CardTitle>
-                <CardDescription>
-                    Your personal API key is required for AI quiz generation. It's stored securely in your browser.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-                <Input 
-                    type="password" 
-                    placeholder="Enter your Gemini API Key" 
-                    className="flex-1" 
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                />
-                <Button onClick={handleSaveKey}>Save Key</Button>
-            </CardContent>
-            <CardFooter>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    How to get your Gemini API Key
-                </a>
-            </CardFooter>
-        </Card>
-    )
-}
 
 const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFromTopicOutput, onDiscard: () => void, isGuest: boolean, topic: string }) => {
     
@@ -279,7 +209,6 @@ export default function DashboardPage() {
     <>
       <h1 className="text-3xl font-bold font-headline mb-8">Workspace</h1>
       
-      {!isGuest && <ApiKeyManager />}
       {isGuest && (
         <Alert className="mb-8 border-primary">
           <Users className="h-4 w-4" />
@@ -296,7 +225,7 @@ export default function DashboardPage() {
           {!isGuest && <TabsTrigger value="manual">Manual Creator</TabsTrigger>}
         </TabsList>
         <TabsContent value="ai" className="mt-4">
-          <AIGenerator onQuizGenerated={handleQuizGenerated} isGuest={isGuest} />
+          <AIGenerator onQuizGenerated={handleQuizGenerated} />
         </TabsContent>
         {!isGuest && <TabsContent value="manual" className="mt-4">
           <ManualCreator />
