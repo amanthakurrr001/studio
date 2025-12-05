@@ -176,14 +176,24 @@ const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFro
     const { toast } = useToast();
 
     const downloadQuiz = () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(quiz, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `${topic.replace(/\s+/g, '_').toLowerCase()}_quiz.json`);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        toast({ title: "Quiz downloaded!" });
+      let content = `Quiz Title: ${topic}\n\n`;
+
+      quiz.quiz.forEach((q, index) => {
+        content += `${index + 1}. ${q.question}\n`;
+        q.options.forEach((option, optionIndex) => {
+          content += `    ${String.fromCharCode(97 + optionIndex)}. ${option}\n`;
+        });
+        content += `    Note: The correct answer is ${q.correctAnswer}.\n\n`;
+      });
+
+      const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(content);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `${topic.replace(/\s+/g, '_').toLowerCase()}_quiz.txt`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      toast({ title: "Quiz downloaded!" });
     }
 
     const saveQuiz = () => {
