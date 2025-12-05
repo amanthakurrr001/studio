@@ -1,39 +1,51 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/componentsui/button';
+import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
-const quizData = [
-    {
-      question: "Who painted the Mona Lisa?",
-      options: ["Leonardo da Vinci", "Michelangelo", "Raphael", "Donatello"],
-      correctAnswer: "Leonardo da Vinci",
-    },
-    {
-      question: "What is the largest planet in our solar system?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-      correctAnswer: "Jupiter",
-    },
-    {
-        question: "What is the capital of Japan?",
-        options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"],
-        correctAnswer: "Tokyo",
-    }
-  ];
+type QuizQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+};
+
+type StoredQuiz = {
+    title: string;
+    quizData: QuizQuestion[];
+};
 
 export default function QuizPlayPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const [quiz, setQuiz] = useState<StoredQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
+
+  useEffect(() => {
+    const storedQuiz = localStorage.getItem('currentQuiz');
+    if (storedQuiz) {
+        setQuiz(JSON.parse(storedQuiz));
+    }
+  }, []);
+
+  if (!quiz) {
+    return (
+        <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
+             <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>
+        </div>
+    )
+  }
+
+  const { title: quizTitle, quizData } = quiz;
 
   const handleNext = () => {
     const isCorrect = selectedAnswer === quizData[currentQuestionIndex].correctAnswer;
@@ -63,8 +75,6 @@ export default function QuizPlayPage({ params }: { params: { id: string } }) {
     { name: 'Correct', value: finalScore },
     { name: 'Incorrect', value: quizData.length - finalScore },
   ];
-
-  const quizTitle = "Sample Quiz"; // This would come from DB
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">

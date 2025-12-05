@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 import { generateQuizFromTopic, type GenerateQuizFromTopicOutput } from '@/ai/flows/generate-quiz-from-topic';
+import { useRouter } from 'next/navigation';
 
 const AIGenerator = ({ onQuizGenerated, isGuest }: { onQuizGenerated: (quiz: GenerateQuizFromTopicOutput) => void, isGuest: boolean }) => {
   const { toast } = useToast();
@@ -174,6 +175,7 @@ const ApiKeyManager = () => {
 const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFromTopicOutput, onDiscard: () => void, isGuest: boolean, topic: string }) => {
     
     const { toast } = useToast();
+    const router = useRouter();
 
     const downloadQuiz = () => {
       let content = `Quiz Title: ${topic}\n\n`;
@@ -199,6 +201,11 @@ const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFro
     const saveQuiz = () => {
         // This is a placeholder for a real save to DB
         toast({ title: "Quiz saved!", description: "This quiz is now in your history." });
+    }
+    
+    const handlePlayQuiz = () => {
+      localStorage.setItem('currentQuiz', JSON.stringify({ title: topic, quizData: quiz.quiz }));
+      router.push('/quiz/play');
     }
 
     if (!quiz || quiz.quiz.length === 0) return null;
@@ -234,7 +241,7 @@ const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFro
                 <CardFooter className="gap-2">
                     {!isGuest && <Button onClick={saveQuiz}><Save /> Save</Button>}
                     <Button variant="secondary" onClick={downloadQuiz}><Download /> Download</Button>
-                    <Button variant="secondary"><Play /> Play Quiz</Button>
+                    <Button variant="secondary" onClick={handlePlayQuiz}><Play /> Play Quiz</Button>
                     <Button variant="destructive" className="ml-auto" onClick={onDiscard}><Trash2 /> Discard</Button>
                 </CardFooter>
             </Card>
