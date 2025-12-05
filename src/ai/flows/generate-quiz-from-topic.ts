@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 
 const GenerateQuizFromTopicInputSchema = z.object({
   topic: z.string().describe('The topic of the quiz.'),
@@ -50,7 +51,11 @@ const generateQuizFromTopicFlow = ai.defineFlow(
     outputSchema: GenerateQuizFromTopicOutputSchema,
   },
   async input => {
-    const {output} = await generateQuizPrompt(input);
+    const {output} = await generateQuizPrompt({
+        ...input,
+    }, {
+        model: googleAI.model('gemini-1.5-flash-latest'),
+    });
     return output!;
   }
 );
