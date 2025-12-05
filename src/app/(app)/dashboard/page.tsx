@@ -129,7 +129,16 @@ const QuizOutput = ({ quiz, onDiscard, isGuest, topic }: { quiz: GenerateQuizFro
     }
 
     const saveQuiz = () => {
-        // This is a placeholder for a real save to DB
+        const history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+        const newQuizEntry = {
+            id: new Date().toISOString(),
+            topic: topic,
+            date: new Date().toLocaleDateString('en-CA'),
+            lastScore: 'N/A',
+            quizData: quiz.quiz
+        };
+        history.unshift(newQuizEntry);
+        localStorage.setItem('quizHistory', JSON.stringify(history));
         toast({ title: "Quiz saved!", description: "This quiz is now in your history." });
     }
     
